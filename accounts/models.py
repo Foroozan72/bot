@@ -1,32 +1,27 @@
+from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
-from .managers import UserManager
 
-class User(AbstractBaseUser):
-    email = models.EmailField(max_length = 255 , unique = True)
-    phone_number = models.CharField(max_length = 11 , unique = True)
-    full_name = models.CharField(max_length = 255)
-    is_active =models.BooleanField(default=True)
-    is_admin =models.BooleanField(default=False)
-
-    objects=UserManager()
-
-    USERNAME_FIELD = 'phone_number'
-    REQUIRED_FIELDS = ['email' , 'full_name']
-
-    def __str__(self) :
-        return self.email
+class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
+    phone = models.CharField(max_length=15, unique=True)  # Adjust max length as needed
+    otp = models.CharField(max_length=6, null=True, blank=True)  # For OTP verification
     
-    def has_perm(self , perm , obj = None):
-        return True
-    
-    def has_module_perms(self, app_label):
-        return True
-    
-    @property
-    def is_staff(self):
-        return self.is_admin
+    # Add unique related_name attributes to prevent reverse accessor clashes
+    groups = models.ManyToManyField(
+        Group,
+        related_name='customuser_set',  # Unique related_name for groups
+        blank=True,
+        help_text='The groups this user belongs to.',
+        related_query_name='customuser'
+    )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='customuser_permissions_set',  # Unique related_name for permissions
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_query_name='customuser'
+    )
 
+    def __str__(self):
+        return self.username
 
-
-# Create your models here.
