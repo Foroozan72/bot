@@ -34,6 +34,9 @@ markup.add(first_button, second_button)
 def send_welcome(message):
     bot.send_message(message.chat.id, "Hi" , reply_markup=markup)
 
+key_markup = telebot_types.ReplyKeyboardMarkup(resize_keyboard=True,row_width=2)
+key_markup.add("One", "Tow","Three", "four")
+
 @bot.message_handler(commands=['help'] )
 def help_me(message):
     bot.reply_to(message , "what can i do? ")
